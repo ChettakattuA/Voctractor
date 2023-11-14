@@ -1,0 +1,4 @@
+Flask
+keybert
+PyPDF2
+pandas

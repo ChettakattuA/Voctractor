@@ -1,0 +1,112 @@
+body{
+    margin:0%;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    zoom:90%;
+  }
+
+  body.loading {
+    overflow: hidden; /* Prevent scrolling when the loading modal is visible */
+    position: relative;
+}
+
+/* Styles for the loading spinner and message */
+#loading {
+    position: fixed;
+    top: -10;
+    left: 0;
+    width: 100%;
+    height: 120vh;
+    background: rgba(0, 0, 0, 0.849); /* Semi-transparent background to create a blur effect */
+    z-index: 9999; /* Make sure it's on top of other elements */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-top:300px;
+    /* border-color: white; */
+}
+
+#loading p {
+    color: white; /* Set the text color to white */
+}
+#Sidebar{
+    border-right: 3px solid darkgreen;
+    width:405px;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    height: 111vh; /* Full screen height */
+    overflow-y: auto; /* Add vertical scrolling if needed */
+}
+#sidebar ul.nav.flex-column {
+    padding-top: 20px;
+}
+#Sidebar nav{
+    margin: 10px 10px 10px 10px ;
+}
+#Sidebar label{
+    font-weight: bold;
+}
+#Sidebar a{
+    color: darkgreen;
+}
+
+#Sidebar button{
+    width:300px;
+}
+
+#logout {
+    text-decoration: none;
+    margin-left: 100% !important; /* Add !important to ensure this value is used */
+    display: inline-block; /* This is important to make margin-left work */
+    transition: margin-left 0.3s; /* Add a smooth transition for margin-left */
+}
+
+/* Tooltip styles */
+#logout:hover::before {
+    content: "Logout";
+    font-size: x-small;
+    display: block;
+    position: absolute;
+    background-color: #000;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 50px;
+    opacity: 0;
+    transition: opacity 0.3s, margin-top 0.3s;
+}
+
+#logout:hover:hover::before {
+    opacity: 1;
+    margin-top: 0px;
+    margin-left: -35px;
+}
+
+
+.highlightedG {
+    background-color: lightgreen;
+    font-weight: bold;
+    }
+  
+  .highlightedB {
+    background-color: lightblue;
+    font-weight: bold;
+    }
+    
+  .highlightedP {
+    background-color: yellow;
+    font-weight: bold;
+    }
+
+
+
+

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=0.9">
+    <title>Keyword Extraction Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+    <!-- Loading Icon -->
+    <div id="loading" class="text-center mt-4"> 
+        <!-- Loading spinner and message -->
+        <div class="spinner-border text-white" role="status">
+            <span class="sr-only"></span>
+        </div>
+        <p>Your document is being processed. This might take some time!</p>
+    </div>
+    <div class="container-fluid" id="screen">
+        <div class="row">
+            <!-- Sidebar -->
+            <div id="Sidebar">
+                <nav class="col-md-4 col-lg-3 d-md-block sidebar">
+                    <div class="position-sticky">
+                        <ul class="nav flex-column">                        
+                                <form id="uploadForm">
+                                    <li class="nav-item">
+                                        <div class="form-group">
+                                        <div id="ValidationAlertPDF" class="alert alert-danger" style="display: none;"></div>
+                                        <div class="mb-3">
+                                            <label for="pdfUpload" class="form-label">Add Your PDF File</label>
+                                            <input class="form-control" type="file" id="pdfUpload" style="height: 40px;">
+                                        </div>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                    <!-- Text Area to Display Stopwords -->
+                                        <div class="form-group">
+                                        <label for="stopwordsTextArea">Stopwords 
+                                            <br><a href="/static/stopwords.txt"  download>Click here to download stopwords.txt file</a>
+                                            <br><a href="#" id="openStopwordsLink">Click here to open the text file</a>
+                                            <script>
+                                            document.getElementById("openStopwordsLink").addEventListener("click", function (event) {
+                                            event.preventDefault(); // Prevent the link from navigating to a new page
+                                    
+                                            // Specify the URL of the text file you want to open
+                                            var url = "/static/stopwords.txt";
+                                    
+                                            // Use the window.open() method to open the text file in a new window
+                                            var newWindow = window.open(url, "_blank");
+                                            
+                                            // Focus on the new window (optional)
+                                            newWindow.focus();
+                                        });
+                                        </script>
+                                        </label>
+                                        <textarea id="stopwordsTextArea" class="form-control" rows="4" readonly></textarea>
+                                        <script>
+                                            // Function to create an XMLHttpRequest object
+                                            function createXMLHttpRequest() {
+                                                var xhr;
+                                                if (window.XMLHttpRequest) {
+                                                    xhr = new XMLHttpRequest();
+                                                } else if (window.ActiveXObject) {
+                                                    xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                                                }
+                                                return xhr;
+                                            }
+                                    
+                                            // Function to update the text area with stopwords
+                                            function updateStopwords() {
+                                                var xhr = createXMLHttpRequest();
+                                                if (xhr) {
+                                                    xhr.open("GET", "/get_stopwords", true);
+                                                    xhr.onreadystatechange = function () {
+                                                        if (xhr.readyState == 4 && xhr.status == 200) {
+                                                            var data = JSON.parse(xhr.responseText);
+                                                            var stopwords = data.stopwords.join('\n');
+                                                            document.getElementById('stopwordsTextArea').value = stopwords;
+                                                        }
+                                                    };
+                                                    xhr.send();
+                                                }
+                                            }
+                                    
+                                            // Call the function to load the stopwords when the page loads
+                                            window.addEventListener('load', updateStopwords);
+                                            // setInterval(updateStopwords, 10000);
+                                        </script>
+                                        </div>
+                                    </li>
+                                    <!-- Text Area to Add Stopwords -->
+                                    <li class="nav-item">
+                                    <div class="form-group">
+                                      <label for="stopwordsInput">Add Stopwords</label>
+                                      <div id="ValidationAlertstopword" class="alert alert-danger" style="display: none;"></div>
+                                      <input type="text" id="stopwordsInput" class="form-control">
+                                      <small class="form-text text-muted">Make sure to separate words with commas.</small>
+                                    </div>
+                                    </li>
+                                  
+                                    <!-- Button to Add Candidate Keywords from Excel -->                     
+                                    <li class="nav-item">
+                                    <div class="form-group mt-4">
+                                      <div class="mb-3">
+                                        <!-- <label for="excelUpload" class="form-label">Add Candidate Keywords (Excel Sheet with 1 Column)</label>
+                                        <div id="ValidationAlertExcel" class="alert alert-danger" style="display: none;"></div>
+                                        <input class="form-control" type="file" id="excelUpload" style="height: 40px;"> -->
+                                        <h6><b>Select the taxonomy as candidates</b></h6>
+                                        <input class="form-check-input" type="radio" name="excelUpload" id="IPCC" value="static\Documents\taxonomies\IPCC.xlsx" checked>
+                                        <label class="form-check-label" for="IPCC">IPCC</label><br>
+                                        <input class="form-check-input" type="radio" name="excelUpload" id="Dril" value="static\Documents\taxonomies\Dril.xlsx">
+                                        <label class="form-check-label" for="Dril">Disaster Resilient Infrastructure Lexicon</label>
+                                        <br><br><a href="/static/candidate.txt" download><b>Click here to download candidate.txt file</b></a>
+                                        <br><a href="#" id="openCandidateLink"><b>Click here to open the text file</b></a>
+                                        <script>
+                                            document.getElementById("openCandidateLink").addEventListener("click", function (event) {
+                                            event.preventDefault(); // Prevent the link from navigating to a new page
+                                    
+                                            // Specify the URL of the text file you want to open
+                                            var url = "/static/candidate.txt";
+                                    
+                                            // Use the window.open() method to open the text file in a new window
+                                            var newWindow = window.open(url, "_blank");
+                                            
+                                            // Focus on the new window (optional)
+                                            newWindow.focus();
+                                        });
+                                        </script>
+                                      </div>
+                                    </div>
+                                    </li>
+                                    <!-- Input Sliders -->
+                                    <li class="nav-item">
+                                    <div class="form-group">
+                                        <label for="numberOfKeywords">Number of Keywords to Find:</label>
+                                        <input type="range" id="numberOfKeywords" name="numberOfKeywords" class="form-range" min="1" max="20" value="1" style="width: 350px;">
+                                        <p>Selected Number of Keywords: <span id="numberOfKeywordsValue">1</span></p>
+                                    
+                                        <label for="diversityBetweenWords">Diversity between words:</label>
+                                        <input type="range" id="diversityBetweenWords" name="diversityBetweenWords" class="form-range " min="0.0" max="1.0" step="0.1" value="0.3" style="width: 350px;">
+                                        <p>Selected Diversity: <span id="diversityBetweenWordsValue">0.3</span></p>
+                                        <script>
+                                            // Get the input elements
+                                            const numberOfKeywordsInput = document.getElementById("numberOfKeywords");
+                                            const diversityBetweenWordsInput = document.getElementById("diversityBetweenWords");
+                                    
+                                            // Get the span elements to display the selected values
+                                            const numberOfKeywordsValue = document.getElementById("numberOfKeywordsValue");
+                                            const diversityBetweenWordsValue = document.getElementById("diversityBetweenWordsValue");
+                                    
+                                            // Function to update the value text when sliders are moved
+                                            function updateSliderValue(slider, valueElement) {
+                                            valueElement.textContent = slider.value;
+                                            }
+                                    
+                                            // Attach event listeners to update the slider values
+                                            numberOfKeywordsInput.addEventListener("input", () => {
+                                            updateSliderValue(numberOfKeywordsInput, numberOfKeywordsValue);
+                                            });
+                                    
+                                            diversityBetweenWordsInput.addEventListener("input", () => {
+                                            updateSliderValue(diversityBetweenWordsInput, diversityBetweenWordsValue);
+                                            });
+                                        </script>
+                                    </div>
+                                    </li>
+                                  
+                                  <button type="submit" class="btn btn-success" id="processBtn" disabled>Process</button> 
+                                
+                                  </form>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <main  class="col-md-8 col-lg-9 px-md-4">
+                <div class="col-12 text-center mt-4">
+                    <h2 class="mb-4">AI-Powered Keyword Extraction Tool</h2>
+                    <div class="container mt-5 " id="gettingStartedContainer">
+                        <div id="excel_data" class="mt-5"></div>
+                        <div class="alert alert-success text-dark">
+                            <h4 class="alert-heading"><b>Getting Started</b></h4>
+                            <p><strong>Here's a quick guide to get started:</strong></p>
+                            <ul>
+                                <li  class="text-left"><strong>Upload Documents :</strong> Click "Choose Files" to add your document. We support only PDF format.</li>
+                                <li><strong>Stopwords:</strong> The stopwords in the box displays all the stopwords in stopwords.txt file.</li>
+                                <li><strong>Add Stopwords :</strong> If you would like to add new stopwords enter them in this field comma seperated.</li>
+                                <li><strong>Add Candidate Keywords :</strong> Select a taxonomy from the list</li>
+                                <li>Choose the <strong>Number of keywords</strong>you want to extract and <strong>diversity between the words</strong>diversity between the words</li>
+                            
+                                <hr>
+                                <p ><strong>The application will extract important keywords along with their scores and display it as 3 results</strong></p>
+                                <li><strong>Suggested Keywords</strong></li>
+                                <li><strong>Suggested Keyphrases</strong></li>
+                                <li><strong>Keywords from Candidates</strong></li><br>
+                                <p>You can select the <strong> useful keywords on the tick button</strong> and it will be added to the list of future candidates</p>
+                                <p>You can unselect the <strong>useless keywords on the cross button</strong> and it will be added to the list of future stopwords</p>
+                            </ul>
+                            <hr>
+                            <p class="mb-0"><strong>It's that simple! Enjoy using the application for effortless document analysis.</strong></p>
+                        </div>
+                    </div>
+                </div>
+                
+                    <div class="accordion" id="accordionResults" style="display: none;">
+                        <div class="accordion-item">
+                          <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                              Results of file 1
+                            </button>
+                          </h2>
+                          <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <div id="alert" class="alert" style="display: none;"></div>
+                                  <div class="card" id="SuggestedKeywords" style="display:none"></div> 
+                                  <div class="card" id="SuggestedKeyphrases" style="display:none;"></div> 
+                                  <div class="card" id="CandidateKeywords" style="display:none;"></div> 
+                                <div class="card">
+                                  <div class="card-body" id="HighlightedText" style="display: none;"></div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                    </div>
+                    
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

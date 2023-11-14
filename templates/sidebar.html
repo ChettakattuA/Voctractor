@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body{
+            margin:0;
+            padding: 0;
+        }
+        #Sidebar nav{
+            padding:10px 10px 10px 10px;
+            border-right: 5px solid darkgreen;
+        }
+        #Sidebar label{
+            font-weight: bold;
+        }
+        #Sidebar a{
+            color: darkgreen;
+        }
+        #Sidebar button{
+            width:350px;
+        }
+    </style>
+</head>
+<body>
+    <div id="Sidebar">
+        <nav class="col-md-4 col-lg-3 d-md-block sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    
+                        <form id="uploadForm">
+                            <li class="nav-item">
+                                <div class="form-group">
+                                <div id="ValidationAlertPDF" class="alert alert-danger" style="display: none;"></div>
+                                <div class="mb-3">
+                                    <label for="pdfUpload" class="form-label">Add Multiple PDF Files</label>
+                                    <input class="form-control" type="file" id="pdfUpload" style="height: 40px;">
+                                </div>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                            <!-- Text Area to Display Stopwords -->
+                                <div class="form-group">
+                                <label for="stopwordsTextArea">Stopwords 
+                                    <br><a href="/static/stopwords.txt"  download>Click here to download stopwords.txt file</a>
+                                    <br><a href="#" id="openStopwordsLink">Click here to open the text file</a>
+                                    <script>
+                                    document.getElementById("openStopwordsLink").addEventListener("click", function (event) {
+                                    event.preventDefault(); // Prevent the link from navigating to a new page
+                            
+                                    // Specify the URL of the text file you want to open
+                                    var url = "/static/stopwords.txt";
+                            
+                                    // Use the window.open() method to open the text file in a new window
+                                    var newWindow = window.open(url, "_blank");
+                                    
+                                    // Focus on the new window (optional)
+                                    newWindow.focus();
+                                });
+                                </script>
+                                </label>
+                                <textarea id="stopwordsTextArea" class="form-control" rows="4" readonly></textarea>
+                                <script>
+                                    // Function to create an XMLHttpRequest object
+                                    function createXMLHttpRequest() {
+                                        var xhr;
+                                        if (window.XMLHttpRequest) {
+                                            xhr = new XMLHttpRequest();
+                                        } else if (window.ActiveXObject) {
+                                            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                                        }
+                                        return xhr;
+                                    }
+                            
+                                    // Function to update the text area with stopwords
+                                    function updateStopwords() {
+                                        var xhr = createXMLHttpRequest();
+                                        if (xhr) {
+                                            xhr.open("GET", "/get_stopwords", true);
+                                            xhr.onreadystatechange = function () {
+                                                if (xhr.readyState == 4 && xhr.status == 200) {
+                                                    var data = JSON.parse(xhr.responseText);
+                                                    var stopwords = data.stopwords.join('\n');
+                                                    document.getElementById('stopwordsTextArea').value = stopwords;
+                                                }
+                                            };
+                                            xhr.send();
+                                        }
+                                    }
+                            
+                                    // Call the function to load the stopwords when the page loads
+                                    window.addEventListener('load', updateStopwords);
+                                    // setInterval(updateStopwords, 10000);
+                                </script>
+                                </div>
+                            </li>
+                            <!-- Text Area to Add Stopwords -->
+                            <li class="nav-item">
+                            <div class="form-group">
+                              <label for="stopwordsInput">Add Stopwords</label>
+                              <div id="ValidationAlertstopword" class="alert alert-danger" style="display: none;"></div>
+                              <input type="text" id="stopwordsInput" class="form-control">
+                              <small class="form-text text-muted">Make sure to separate words with commas.</small>
+                            </div>
+                            </li>
+                          
+                            <!-- Button to Add Candidate Keywords from Excel -->                     
+                            <li class="nav-item">
+                            <div class="form-group mt-4">
+                              <div class="mb-3">
+                                <label for="excelUpload" class="form-label">Add Candidate Keywords (Excel Sheet with 1 Column)</label>
+                                <div id="ValidationAlertExcel" class="alert alert-danger" style="display: none;"></div>
+                                <input class="form-control" type="file" id="excelUpload" style="height: 40px;">
+                                <br><a href="/static/candidate.txt" download><b>Click here to download candidate.txt file</b></a>
+                                <br><a href="#" id="openCandidateLink"><b>Click here to open the text file</b></a>
+                                <script>
+                                    document.getElementById("openCandidateLink").addEventListener("click", function (event) {
+                                    event.preventDefault(); // Prevent the link from navigating to a new page
+                            
+                                    // Specify the URL of the text file you want to open
+                                    var url = "/static/candidate.txt";
+                            
+                                    // Use the window.open() method to open the text file in a new window
+                                    var newWindow = window.open(url, "_blank");
+                                    
+                                    // Focus on the new window (optional)
+                                    newWindow.focus();
+                                });
+                                </script>
+                              </div>
+                            </div>
+                            </li>
+                            <!-- Input Sliders -->
+                            <li class="nav-item">
+                            <div class="form-group">
+                                <label for="numberOfKeywords">Number of Keywords to Find:</label>
+                                <input type="range" id="numberOfKeywords" name="numberOfKeywords" class="form-range" min="1" max="20" value="1" style="width: 350px;">
+                                <p>Selected Number of Keywords: <span id="numberOfKeywordsValue">1</span></p>
+                            
+                                <label for="diversityBetweenWords">Diversity between words:</label>
+                                <input type="range" id="diversityBetweenWords" name="diversityBetweenWords" class="form-range" min="0.0" max="1.0" step="0.1" value="0.5" style="width: 350px;">
+                                <p>Selected Diversity: <span id="diversityBetweenWordsValue">0.3</span></p>
+                                <script>
+                                    // Get the input elements
+                                    const numberOfKeywordsInput = document.getElementById("numberOfKeywords");
+                                    const diversityBetweenWordsInput = document.getElementById("diversityBetweenWords");
+                            
+                                    // Get the span elements to display the selected values
+                                    const numberOfKeywordsValue = document.getElementById("numberOfKeywordsValue");
+                                    const diversityBetweenWordsValue = document.getElementById("diversityBetweenWordsValue");
+                            
+                                    // Function to update the value text when sliders are moved
+                                    function updateSliderValue(slider, valueElement) {
+                                    valueElement.textContent = slider.value;
+                                    }
+                            
+                                    // Attach event listeners to update the slider values
+                                    numberOfKeywordsInput.addEventListener("input", () => {
+                                    updateSliderValue(numberOfKeywordsInput, numberOfKeywordsValue);
+                                    });
+                            
+                                    diversityBetweenWordsInput.addEventListener("input", () => {
+                                    updateSliderValue(diversityBetweenWordsInput, diversityBetweenWordsValue);
+                                    });
+                                </script>
+                            </div>
+                            </li>
+                          
+                          <button type="submit" class="btn btn-success" id="processBtn" disabled>Process</button> 
+                        
+                          </form>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>
