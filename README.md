@@ -68,3 +68,6 @@ Austrian Institute of Technology
 email: aradina.chettakattu@ait.ac.at
 
 - Under the supervision of 
+Dr Denis Havlik
+Austrian Institute of Technology
+email: denis.havlik@ait.ac.at
