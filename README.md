@@ -61,10 +61,10 @@ The output will consist of:
 - **Keywords from Candidates**: Cosine similarity between each word in the candidate list and document embeddings, displaying words above a score of 0.1.
 
 ## Contact Details
-- Aradina Chettakattu Msc
-- Austrian Institute of Technology
-- email: aradina.chettakattu@ait.ac.at
+Aradina Chettakattu Msc
+Austrian Institute of Technology
+email: aradina.chettakattu@ait.ac.at
 
-- Denis Havlik Msc
-- Austrian Institute of Technology
-- email: denis.havlik@ait.ac.at
+Denis Havlik Msc
+Austrian Institute of Technology
+email: denis.havlik@ait.ac.at
