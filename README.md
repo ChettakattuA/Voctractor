@@ -1,6 +1,7 @@
 # Keyword Extraction using KeyBERT
 
 ⚠️**Project Rights: This project is the intellectual property of AIT and was developed within the context of the EU funded climate project MAIA+.**
+
 Keyword Extraction is crucial for document analysis and information retrieval, providing concise representation of context and topics within textual data. Manually finding relevant keywords for numerous extensive documents is arduous, error-prone, and time-consuming. To address this challenge, we've developed a prototype leveraging KeyBERT to automate the process, utilizing BERT embeddings to efficiently extract and identify relevant terms for each document, streamlining the keyword extraction workflow.
 
 ## What is KeyBERT?
