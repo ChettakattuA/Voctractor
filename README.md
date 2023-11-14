@@ -1,5 +1,6 @@
 # Keyword Extraction using KeyBERT
-⚠️**Project Rights: This project is the intellectual property of AIT and was developed within the context of the EU funded project MAIA+.**
+
+⚠️**Project Rights: This project is the intellectual property of AIT and was developed within the context of the EU funded climate project MAIA+.**
 Keyword Extraction is crucial for document analysis and information retrieval, providing concise representation of context and topics within textual data. Manually finding relevant keywords for numerous extensive documents is arduous, error-prone, and time-consuming. To address this challenge, we've developed a prototype leveraging KeyBERT to automate the process, utilizing BERT embeddings to efficiently extract and identify relevant terms for each document, streamlining the keyword extraction workflow.
 
 ## What is KeyBERT?
@@ -57,3 +58,12 @@ The output will consist of:
 - **Suggested Keywords**: Calculated using cosine similarity between word embeddings and document embeddings. Words with the highest similarity scores are displayed.
 - **Suggested Phrases**: Similar to suggested keywords but considers multi-word phrases.
 - **Keywords from Candidates**: Cosine similarity between each word in the candidate list and document embeddings, displaying words above a score of 0.1.
+
+## Contact Details
+Aradina Chettakattu Msc
+Austrian Institute of Technology
+email: aradina.chettakattu@ait.ac.at
+
+Denis Havlik Msc
+Austrian Institute of Technology
+email: denis.havlik@ait.ac.at
