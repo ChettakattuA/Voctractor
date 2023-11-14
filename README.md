@@ -1,5 +1,5 @@
 # Voctractor
-<a href="https://www.ait.ac.at/en/" ><img src="https://github.com/ChettakattuA/Voctractor/blob/main/static/Documents/logos/ait.jpg?raw=true" alt="Sample Image" width="250" height="125"></a>
+<a href="https://www.ait.ac.at/en/" ><img src="https://github.com/ChettakattuA/Voctractor/blob/main/static/Documents/logos/ait.jpg?raw=true" alt="Sample Image" width="300" height="125"></a>
 
 **Copyright 2023 AIT Austrian Institute of Technology GmbH**
 
