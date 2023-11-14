@@ -1,6 +1,19 @@
-# Keyword Extraction using KeyBERT
+# Voctractor
+**Copyright 2023 AIT Austrian Institute of Technology GmbH**
 
-⚠️**Project Rights: This project is the intellectual property of AIT and was developed within the context of the EU funded climate project MAIA+.**
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+## Keyword Extraction using KeyBERT
 
 Keyword Extraction is crucial for document analysis and information retrieval, providing concise representation of context and topics within textual data. Manually finding relevant keywords for numerous extensive documents is arduous, error-prone, and time-consuming. To address this challenge, we've developed a prototype leveraging KeyBERT to automate the process, utilizing BERT embeddings to efficiently extract and identify relevant terms for each document, streamlining the keyword extraction workflow.
 
@@ -18,7 +31,7 @@ KeyBERT is a minimal and user-friendly keyword extraction technique that utilize
 - **use_mmr**: Whether to use Maximal Marginal Relevance (MMR) for the selection of keywords/keyphrases.
 - **diversity**: The diversity of the results between 0 and 1 if `use_mmr` is set to True.
 
-## Voctractor?
+## Voctractor
 
 We've created a prototype that processes multiple documents and a candidate list of terms for keyword extraction, resulting in three lists: 
 1. Suggested Keywords 
@@ -63,6 +76,10 @@ The output will consist of:
 ## References
 - **KeyBERT** - https://maartengr.github.io/KeyBERT/
 - **KeyBERT GITHUB** - https://github.com/MaartenGr/keyBERT
+
+## Acknowledgements
+
+Voctractor has been designed and developed in the MAIA project which has funding from European Union's Horizon Europe Research and Innovation programme under grant agreement No 101056935 and facilitated by numerous discussions with Kate Williamson and Sukaina Bharwani from the Stockholm Environment Institute, Andrea Geyer-Scholz from Smart Cities Consulting and Marcelo Rita-Pias from the Federal University of Rio Grande -FURG, Brazil. 
 
 ## Contact Details
 - The project is authored by 
