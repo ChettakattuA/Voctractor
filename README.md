@@ -78,7 +78,9 @@ The output will consist of:
 - **KeyBERT GITHUB** - https://github.com/MaartenGr/keyBERT
 
 ## Acknowledgements
-<img src="https://github.com/ChettakattuA/Voctractor/blob/main/static/Documents/logos/ait.jpg?raw=true" alt="Sample Image" width="300" height="175">
+<a href="https://www.ait.ac.at/en/" ><img src="https://github.com/ChettakattuA/Voctractor/blob/main/static/Documents/logos/ait.jpg?raw=true" alt="Sample Image" width="300" height="175"></a>
+<a href="https://maia-project.eu/" ><img src="https://github.com/ChettakattuA/Voctractor/blob/main/static/Documents/logos/MAIA.PNG?raw=true" alt="Sample Image" width="300" height="175"></a>
+<a href="https://european-union.europa.eu/index_en" ><img src="https://github.com/ChettakattuA/Voctractor/blob/main/static/Documents/logos/eu.png?raw=true" alt="Sample Image" width="300" height="175"></a>
 Voctractor has been designed and developed in the MAIA project which has funding from European Union's Horizon Europe Research and Innovation programme under grant agreement No 101056935 and facilitated by numerous discussions with Kate Williamson and Sukaina Bharwani from the Stockholm Environment Institute, Andrea Geyer-Scholz from Smart Cities Consulting and Marcelo Rita-Pias from the Federal University of Rio Grande -FURG, Brazil. 
 
 ## Contact Details
