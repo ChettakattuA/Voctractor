@@ -83,11 +83,11 @@ Voctractor has been designed and developed in the MAIA project which has funding
 
 ## Contact Details
 - The project is authored by 
-**Aradina Chettakattu Msc**
+**Aradina Chettakattu Msc,**
 **Austrian Institute of Technology**
 email: aradina.chettakattu@ait.ac.at
 
 - Under the supervision of 
-**Dr Denis Havlik**
+**Dr Denis Havlik,**
 **Austrian Institute of Technology**
 email: denis.havlik@ait.ac.at
