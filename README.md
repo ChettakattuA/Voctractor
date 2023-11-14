@@ -60,11 +60,11 @@ The output will consist of:
 - **Suggested Phrases**: Similar to suggested keywords but considers multi-word phrases.
 - **Keywords from Candidates**: Cosine similarity between each word in the candidate list and document embeddings, displaying words above a score of 0.1.
 
+
 ## Contact Details
+- The project is authored by 
 Aradina Chettakattu Msc
 Austrian Institute of Technology
 email: aradina.chettakattu@ait.ac.at
 
-Denis Havlik Msc
-Austrian Institute of Technology
-email: denis.havlik@ait.ac.at
+- Under the supervision of 
