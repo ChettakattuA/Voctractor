@@ -60,6 +60,9 @@ The output will consist of:
 - **Suggested Phrases**: Similar to suggested keywords but considers multi-word phrases.
 - **Keywords from Candidates**: Cosine similarity between each word in the candidate list and document embeddings, displaying words above a score of 0.1.
 
+## References
+- **KeyBERT** - https://maartengr.github.io/KeyBERT/
+- **KeyBERT GITHUB** - https://github.com/MaartenGr/keyBERT
 
 ## Contact Details
 - The project is authored by 
