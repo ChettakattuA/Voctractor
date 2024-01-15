@@ -22,6 +22,7 @@ Keyword Extraction is crucial for document analysis and information retrieval, p
 ## What is KeyBERT?
 
 KeyBERT is a minimal and user-friendly keyword extraction technique that utilizes BERT embeddings to generate keywords and key phrases most similar to a document.
+#### FYI : KeyBERT is developed by Maarten Grootendorst : https://github.com/MaartenGr/KeyBERT 
 
 ### Useful Parameters of KeyBERT
 
