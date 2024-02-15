@@ -88,7 +88,7 @@ The output will consist of:
 Voctractor has been designed and developed in the MAIA project which has funding from European Union's Horizon Europe Research and Innovation programme under grant agreement No 101056935 and facilitated by numerous discussions with Kate Williamson and Sukaina Bharwani from the Stockholm Environment Institute, Andrea Geyer-Scholz from Smart Cities Consulting and Marcelo Rita-Pias from the Federal University of Rio Grande -FURG, Brazil. 
 
 ## Contact Details
-- The project is authored by 
+- The project is developed by 
 **Aradina Chettakattu Msc,**
 **Austrian Institute of Technology**
 email: aradina.chettakattu@ait.ac.at
