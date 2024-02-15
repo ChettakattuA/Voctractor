@@ -40,8 +40,8 @@ We've created a prototype that processes multiple documents and a candidate list
 1. Suggested Keywords 
 2. Suggested Key Phrases 
 3. Keywords extracted from candidates
+4. Keywords from several matched custom candidate list
 
-Additionally, the extracted keywords are highlighted within the document text for easy reference.
 
 ### User Interaction
 
