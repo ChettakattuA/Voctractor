@@ -1,46 +1,38 @@
-/*
-Copyright 2023 AIT Austrian Institute of Technology GmbH
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 $(document).ready(function () {
     const loadingDiv = document.getElementById('loading');
     loadingDiv.style.display = 'none';
+
     uploadForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         
-        const pdfFiles= document.getElementById('pdfUpload').files;
+        const pdfFiles = document.getElementById('pdfUpload').files;
+        const model = document.getElementById('EmbedModel').value;
         const stopwords= document.getElementById('stopwordsInput').value;
+        const stopwordsDelete= document.getElementById('stopwordsDelete').value;
         const ExcelFile= document.querySelector('input[name="excelUpload"]:checked').value;
+        const newCandidateName= document.getElementById('CandidateListName').value;
+        const newCandidateOrg= document.getElementById('CandidateListOrg').value;
         const No_of_Words= document.getElementById('numberOfKeywords').value;
         const Diversity= document.getElementById('diversityBetweenWords').value;
-        
+               
         loadingDiv.style.display = 'block';
-        sendFilesAndUrlsToServer(pdfFiles, stopwords, ExcelFile,No_of_Words,Diversity);
+        sendFilesAndUrlsToServer(pdfFiles,model, stopwords,stopwordsDelete, ExcelFile,newCandidateName,newCandidateOrg,No_of_Words,Diversity);
     })
 
-    function sendFilesAndUrlsToServer(pdfFiles, stopwords, ExcelFile,No_of_Words,Diversity) {
+    function sendFilesAndUrlsToServer(pdfFiles, model, stopwords,stopwordsDelete, ExcelFile,newCandidateName,newCandidateOrg,No_of_Words,Diversity) {
         const formData = new FormData();
         for (const file of pdfFiles) {
             formData.append('file_paths', file);
         }
 
+        formData.append("model", model);
         formData.append("StopwordsByUser", stopwords);
+        formData.append("StopwordsDelete", stopwordsDelete);
         formData.append("TopNByUser", No_of_Words);
         formData.append("DiversityByUser", Diversity);
         formData.append('excelfile', ExcelFile);
+                
         // Send a POST request to the server
         fetch('/process_documents', {
             method: 'POST',
@@ -63,348 +55,341 @@ $(document).ready(function () {
 
 
     function displayResults(results) {
+        
         loadingDiv.style.display = 'none';
         // Get the results container element
         document.getElementById("gettingStartedContainer").style.display = "none";
-        document.getElementById("accordionResults").style.display = "block";
-        const SuggestedKeywordsCard = document.getElementById('SuggestedKeywords');
-        SuggestedKeywordsCard.style.display = "block";
-        SuggestedKeywordsCard.innerHTML = '';
-        const suggestedKeywordsHeader = document.createElement('div');
-        suggestedKeywordsHeader.classList.add('card-header');
-        suggestedKeywordsHeader.innerHTML = 'Suggested Keywords';
-        SuggestedKeywordsCard.appendChild(suggestedKeywordsHeader);
+        // FinalResults = document.getElementById("content");
+        // // FinalResults = document.getElementById("accordionResults");
+        // FinalResults.style.display = "block";
+        
 
-        const suggestedKeywordslist = document.createElement('ul');
-        suggestedKeywordslist.classList.add('list-group','list-group-flush');
-        SuggestedKeywordsCard.appendChild(suggestedKeywordslist);
+        const contentDiv = document.getElementById('content');
+
+
+        const buttonClearAll =  document.createElement('button');
+        buttonClearAll.textContent = 'Clear all results';
+        buttonClearAll.classList.add('btn', 'btn-warning','mr-2');
+
+        // Positioning the button in the top-right corner
+        // buttonClearAll.style.position = 'absolute';
+        buttonClearAll.style.width = '100%'; // Adjust as needed
+
+        buttonClearAll.addEventListener('click', function() {
+            const confirmation = window.confirm(`Do you want to clear all results from screen. This action cannot be undone`);
+            if (confirmation){
+                contentDiv.remove();
+                document.getElementById("gettingStartedContainer").style.display = "block";
+            }
+        });
+
+        // contentDiv.appendChild(buttonClearAll);
+
+
+        results.forEach(result => {
+            createCard(result, contentDiv);
+          });
 
         
-        for (const result of results){
-            
-            for (const keyword of result.keywords) {
-                
-                const suggestedKeywordssublist = document.createElement('li');
-                suggestedKeywordssublist.classList.add('list-group-item','d-flex', 'justify-content-between', 'align-items-center');
-                const keywordText = document.createTextNode(keyword[0]+" : "+keyword[1]);
-
-                const buttonsContainer = document.createElement('div');
-                buttonsContainer.classList.add('d-flex', 'align-items-center');
-
-                const button1 = document.createElement('button');
-                button1.textContent = '✘';
-                button1.classList.add('btn', 'btn-danger', 'mr-2'); // Add margin to the right
-
-                const button2 = document.createElement('button');
-                button2.textContent = '✓';
-                button2.classList.add('btn', 'btn-success');
-
-                // Append the elements to the list item
-                buttonsContainer.appendChild(button1);
-                buttonsContainer.appendChild(button2);
-
-                suggestedKeywordssublist.appendChild(keywordText);
-                suggestedKeywordssublist.appendChild(buttonsContainer);
-
-                suggestedKeywordslist.appendChild(suggestedKeywordssublist);
-
-                
-                
-            }
-        }
-        
-        const SuggestedKeyPhrasesCard = document.getElementById('SuggestedKeyphrases');
-        SuggestedKeyPhrasesCard.style.display = "block";
-        SuggestedKeyPhrasesCard.innerHTML = "";
-        const suggestedKeyPhrasesheader = document.createElement('div');
-        suggestedKeyPhrasesheader.classList.add('card-header');
-        suggestedKeyPhrasesheader.innerHTML = 'Suggested Key Phrases';
-        SuggestedKeyPhrasesCard.appendChild(suggestedKeyPhrasesheader);
-
-        const SuggestedKeyPhraseslist = document.createElement('ul');
-        SuggestedKeyPhraseslist.classList.add('list-group','list-group-flush');
-        SuggestedKeyPhrasesCard.appendChild(SuggestedKeyPhraseslist);
-
-        
-        for (const result of results){
-            for (const keyword of result.keyphrases) {
-                
-                const SuggestedKeyPhrasessublist = document.createElement('li');
-                SuggestedKeyPhrasessublist.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-
-                const keywordText = document.createTextNode(keyword[0]+" : "+keyword[1]);
-
-                const buttonsContainer = document.createElement('div');
-                buttonsContainer.classList.add('d-flex', 'align-items-center');
-
-                const button1 = document.createElement('button');
-                button1.textContent = '✘';
-                button1.classList.add('btn', 'btn-danger', 'mr-2'); // Add margin to the right
-
-                const button2 = document.createElement('button');
-                button2.textContent = '✓';
-                button2.classList.add('btn', 'btn-success');
-
-                // Append the elements to the list item
-                buttonsContainer.appendChild(button1);
-                buttonsContainer.appendChild(button2);
-
-                SuggestedKeyPhrasessublist.appendChild(keywordText);
-                SuggestedKeyPhrasessublist.appendChild(buttonsContainer);
-
-                SuggestedKeyPhraseslist.appendChild(SuggestedKeyPhrasessublist);
-                
-            }
-        }
-
-        const CandidateKeywordsCard = document.getElementById('CandidateKeywords');
-        CandidateKeywordsCard.style.display = "block";
-        CandidateKeywordsCard.innerHTML = "";
-        const CandidateKeywordsHeader = document.createElement('div');
-        CandidateKeywordsHeader.classList.add('card-header');
-        CandidateKeywordsHeader.innerHTML = 'Keywords from Candidates';
-        CandidateKeywordsCard.appendChild(CandidateKeywordsHeader);
-
-        const CandidateKeywordslist = document.createElement('ul');
-        CandidateKeywordslist.classList.add('list-group','list-group-flush');
-        CandidateKeywordsCard.appendChild(CandidateKeywordslist);
-
-        
-        for (const result of results){
-            for (const keyword of result.KeywordsFromCandidates) {
-                
-                const CandidateKeywordssublist = document.createElement('li');
-                CandidateKeywordssublist.classList.add('list-group-item','d-flex', 'justify-content-between', 'align-items-center');
-                const keywordText = document.createTextNode(keyword[0]+" : "+keyword[1]);
-
-                const buttonsContainer = document.createElement('div');
-                buttonsContainer.classList.add('d-flex', 'align-items-center');
-
-                const button1 = document.createElement('button');
-                button1.textContent = '✘';
-                button1.classList.add('btn', 'btn-danger', 'mr-2'); // Add margin to the right
-
-                const button2 = document.createElement('button');
-                button2.textContent = '✓';
-                button2.classList.add('btn', 'btn-success');
-
-                // Append the elements to the list item
-                buttonsContainer.appendChild(button1);
-                buttonsContainer.appendChild(button2);
-
-                CandidateKeywordssublist.appendChild(keywordText);
-                CandidateKeywordssublist.appendChild(buttonsContainer);
-
-                CandidateKeywordslist.appendChild(CandidateKeywordssublist);
-                
-            }
-        }
-
-
-        //Highlight Text 
-        const TextCard = document.getElementById('HighlightedText');
-        TextCard.style.display = "block";
-        for (const result of results){
-            var textContent = result.pdftext;
-            var allkeywords = result.AllKeywordstoHighlight;
-            // Iterate through the keywords list
-            for (const keywordarray of result.keywords){
-                const keyword = keywordarray[0];
-                // Create a regular expression to find the keyword with word boundaries
-                var regex = new RegExp("\\b" + keyword + "\\b", "gi");
-
-                // Replace the keyword with the same keyword wrapped in a <span> for highlighting
-                textContent = textContent.replace(regex, '<span class="highlightedG">' + keyword + '</span>');
-            }
-            for (const keywordarray of result.keyphrases){
-                const keyword = keywordarray[0];
-                // Create a regular expression to find the keyword with word boundaries
-                var regex = new RegExp("\\b" + keyword + "\\b", "gi");
-
-                // Replace the keyword with the same keyword wrapped in a <span> for highlighting
-                textContent = textContent.replace(regex, '<span class="highlightedB">' + keyword + '</span>');
-            }
-            for (const keywordarray of result.KeywordsFromCandidates){
-                const keyword = keywordarray[0];
-                // Create a regular expression to find the keyword with word boundaries
-                var regex = new RegExp("\\b" + keyword + "\\b", "gi");
-
-                // Replace the keyword with the same keyword wrapped in a <span> for highlighting
-                textContent = textContent.replace(regex, '<span class="highlightedP">' + keyword + '</span>');
-            }
-            // Update the element's content with the highlighted text
-            TextCard.innerHTML = "<h3>Highlighted Keywords on text</h3> <b>(<span class='highlightedG'>Green: Suggested Keywords</span>,<span class='highlightedB'> Blue: Suggested KeyPhrases</span>, <span class='highlightedP'> Pink: Candidate Keywords</span>)</b><br><br>"+textContent;
-
-        }
-
-        //Highlight Text 
-        // const TextCard = document.getElementById('HighlightedText');
-        // TextCard.style.display = "block";
-        // const Heading = document.createElement("h3");
-        // Heading.innerHTML = "HighLighted Keyowrds on Text"
-        // TextCard.appendChild(Heading)
-        // const options = ["Suggested Keywords", "Suggested Keyphrases", "Keywords from Candidate"];
-
-        // options.forEach((option, index) => {
-        //     const radioButton = document.createElement("input");
-        //     radioButton.type = "radio";
-        //     radioButton.id = "option" + (index + 1);
-        //     radioButton.name = "options";
-        //     radioButton.value = option;
-        //     TextCard.appendChild(radioButton);
-
-        //     const label = document.createElement("label");
-        //     label.htmlFor = "option" + (index + 1);
-        //     label.textContent = " "+option+" ";
-        //     TextCard.appendChild(label);
-            
-        //     const body = document.createElement("div");
-        //     TextCard.appendChild(body)
-        //     // Add click event listener to each radio button
-        //     radioButton.addEventListener("click", () => {
-        //         const clickedId = radioButton.id;
-        //         console.log(clickedId)
-        //         switch (clickedId){
-        //             case "option1":
-        //                 for (const result of results){
-        //                     var textContent = result.pdftext;
-        //                     for (const keywordarray of result.keywords){
-        //                         const keyword = keywordarray[0];
-        //                         // Create a regular expression to find the keyword with word boundaries
-        //                         var regex = new RegExp("\\b" + keyword + "\\b", "gi");
-                
-        //                         // Replace the keyword with the same keyword wrapped in a <span> for highlighting
-        //                         textContent = textContent.replace(regex, '<span class="highlightedG">' + keyword + '</span>');
-        //                         body.innerHTML = textContent;
-        //                     }
-        //                 }
-                        
-        //                 break;
-        //             case "option2":
-
-        //                 for (const result of results){
-        //                     var textContent = result.pdftext;
-        //                     for (const keywordarray of result.keyphrases){
-        //                         const keyword = keywordarray[0];
-        //                         // Create a regular expression to find the keyword with word boundaries
-        //                         var regex = new RegExp("\\b" + keyword + "\\b", "gi");
-                
-        //                         // Replace the keyword with the same keyword wrapped in a <span> for highlighting
-        //                         textContent = textContent.replace(regex, '<span class="highlightedB">' + keyword + '</span>');
-        //                         body.innerHTML = textContent;
-        //                     }
-        //                 }
-        //                 break;
-
-        //             case "option3":
-
-        //                 for (const result of results){
-        //                     var textContent = result.pdftext;
-        //                     for (const keywordarray of result.KeywordsFromCandidates){
-        //                         const keyword = keywordarray[0];
-        //                         // Create a regular expression to find the keyword with word boundaries
-        //                         var regex = new RegExp("\\b" + keyword + "\\b", "gi");
-                
-        //                         // Replace the keyword with the same keyword wrapped in a <span> for highlighting
-        //                         textContent = textContent.replace(regex, '<span class="highlightedP">' + keyword + '</span>');
-        //                         body.innerHTML = textContent;
-        //                     }
-        //                 }
-        //                 break;
-        //             default:
-        //                 for (const result of results){
-        //                     var textContent = result.pdftext;
-        //                     body.innerHTML = textContent;
-        //                 }
-        //         }
-        //     });
-        // });
-
-
-
     }
 
-    document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('btn-danger')) {
-            // Get the <li> element containing the keyword
-            const listItem = event.target.closest('li');
+    function createCard(result, contentDiv) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.id = result.filename;
+      
+        const cardHeader = document.createElement('div');
+        cardHeader.classList.add('card-header', 'd-flex', 'justify-content-between', 'align-items-center');
+      
+        const text = document.createElement('h5');
+        text.textContent = `File: ${result.filename}`;
+        text.style.fontWeight = 'bold';
 
-            if (listItem) {
-                // Extract the keyword from the text content of the <li> element
-                var keyword = listItem.textContent.trim();
-                keywordSplit = keyword.split(":");
-                keyword = keywordSplit[0];
-                // Send an HTTP POST request to your Python backend
-                fetch('/add_stopword', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ keyword: keyword }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const Alert = document.getElementById('alert');
-                        Alert.innerText = data.message;
-                        Alert.classList.add('alert-success');
-                        Alert.style.display = 'block';
-                        updateStopwords();
-                    } else {
-                        // Handle errors and display the error message in the Bootstrap alert
-                        const Alert = document.getElementById('alert');
-                        Alert.innerText = data.error;
-                        Alert.classList.add('alert-danger');
-                        Alert.style.display = 'block';
-                    }
-                })
-                
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+        const HeaderbuttonsContainer = document.createElement('div');
+        HeaderbuttonsContainer.classList.add('d-flex', 'align-items-center');
+
+        const buttonDltRes = document.createElement('button');
+        buttonDltRes.textContent = 'x';
+        buttonDltRes.classList.add('btn', 'btn-danger','mr-2');
+
+        buttonDltRes.addEventListener('mouseenter', function() {
+            buttonDltRes.textContent = 'Clear result from screen';
+        });
+        buttonDltRes.addEventListener('mouseleave', function() {
+            buttonDltRes.textContent = 'x';
+        });
+
+        buttonDltRes.addEventListener('click', function() {
+            const confirmation = window.confirm(`Do you want to remove result "${result.filename}" from screen. This action cannot be undone`);
+            if (confirmation){
+                DltCard = document.getElementById(result.filename);
+                DltCard.remove();
             }
+        });
+      
+        const buttonExpand = document.createElement('button');
+        buttonExpand.textContent = '+';
+        buttonExpand.classList.add('btn', 'btn-secondary');
+        buttonExpand.setAttribute('aria-expanded', 'false');
+        buttonExpand.setAttribute('aria-controls', `definition_${result.filename.replace(/\s/g, '_')}`);
+        
+                 
+        const definition = document.createElement('p');
+        definition.style.display = 'none';
+        definition.setAttribute('id', `definition_${result.filename.replace(/\s/g, '_')}`);
+        
+        const keywordList = document.createElement('ul');
+        keywordList.classList.add('list-group', 'list-group-flush');
+        const keyPhrasesList = document.createElement('ul');
+        keyPhrasesList.classList.add('list-group', 'list-group-flush');
+        const candidateList = document.createElement('ul');
+        candidateList.classList.add('list-group', 'list-group-flush');
+
+        
+        const staticKeyword = document.createElement('li');
+        staticKeyword.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        staticKeyword.innerHTML = '<h5><b>Suggested Keywords</b></h5>';
+    
+        const staticKeyPhrases = document.createElement('li');
+        staticKeyPhrases.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        staticKeyPhrases.innerHTML = '<h5><b>Suggested Keyphrases</b></h5>';
+    
+        const staticCandidateKeyword = document.createElement('li');
+        staticCandidateKeyword.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        staticCandidateKeyword.innerHTML = '<h5><b>Keywords from selected taxonomy</b></h5>';
+
+        keywordList.appendChild(staticKeyword);
+        keyPhrasesList.appendChild(staticKeyPhrases);
+        candidateList.appendChild(staticCandidateKeyword);
+
+        var randomNumber = Math.floor(Math.random() * 100) + 1;
+    
+
+        createListItem(result.keywords, keywordList, result.CandidateFiles,false,undefined,randomNumber);
+        createListItem(result.keyphrases, keyPhrasesList,result.CandidateFiles,false,undefined,randomNumber);
+        createListItem(result.FinalKeywordsFromTaxonomy, candidateList,result.CandidateFiles,false,undefined,randomNumber);
+
+        
+        definition.appendChild(keywordList);
+        definition.appendChild(keyPhrasesList);
+        definition.appendChild(candidateList);
+
+        // Dynamically create lists based on CandidateMatchedKeywords
+        const CandidateFiles = result.CandidateFiles.slice(1)
+        CandidateFiles.forEach((file,index) => {
+            const dynamicList = document.createElement('ul');
+            dynamicList.classList.add('list-group', 'list-group-flush');
+
+            const staticListItem = document.createElement('li');
+            staticListItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            staticListItem.innerHTML = `<h5><b>Keywords from ${file}</b></h5>`;
+            dynamicList.appendChild(staticListItem);
+            createListItem(result.CandidateMatchedKeywords[index], dynamicList ,result.CandidateFiles,true,file,randomNumber);
+            definition.appendChild(dynamicList);
+        });
+
+        buttonExpand.addEventListener('click', () => {
+            const expanded = buttonExpand.getAttribute('aria-expanded') === 'true';
+            buttonExpand .setAttribute('aria-expanded', String(!expanded));
+            definition.style.display = expanded ? 'none' : 'block';
+            buttonExpand .textContent = expanded ? '+' : '-';
+        });
+    
+        HeaderbuttonsContainer.append(buttonDltRes);
+        HeaderbuttonsContainer.append(buttonExpand);
+        cardHeader.appendChild(text);
+        cardHeader.appendChild(HeaderbuttonsContainer);
+        card.appendChild(cardHeader);
+        card.appendChild(definition);
+
+    
+      
+        contentDiv.appendChild(card);
+        updateStopwords();
+    }
+    
+    function createListItem(data, listContainer,CandidateFiles, newButton,Cfile,randomNumber) {
+        const hr = document.createElement('hr');
+        hr.style.border = '1px solid black'
+        if (data.length === 0) {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            const itemText = document.createTextNode("No keyowrds from the list matched to the document");
+            li.appendChild(itemText);
+            listContainer.appendChild(li);
         }
-    });
+        else{
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                li.id = item[0]+randomNumber;
+                const itemText = document.createTextNode(item[0] + " : " + item[1]);
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.classList.add('d-flex', 'align-items-center');
+        
+                if (newButton==true){
+                    const button0 = document.createElement('button');
+                    button0.textContent = 'REMOVE FROM LIST';
+                    button0.classList.add('btn', 'btn-primary', 'mr-2');
+                    button0.addEventListener('click', function(){
+                        DltKeywordsFromList(item[0],Cfile,randomNumber);
+                      });
+                    buttonsContainer.appendChild(button0);
+                }
 
-    document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('btn-success')) {
-            // Get the <li> element containing the keyword
-            const listItem = event.target.closest('li');
-
-            if (listItem) {
-                // Extract the keyword from the text content of the <li> element
-                var keyword = listItem.textContent.trim();
-                keywordSplit = keyword.split(":");
-                keyword = keywordSplit[0];
-                // Send an HTTP POST request to your Python backend
-                fetch('/add_candidate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ keyword: keyword }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const Alert = document.getElementById('alert');
-                        Alert.innerText = data.message;
-                        Alert.classList.add('alert-success');
-                        Alert.style.display = 'block';
-                        updateStopwords();
-                    } else {
-                        // Handle errors and display the error message in the Bootstrap alert
-                        const Alert = document.getElementById('alert');
-                        Alert.innerText = data.error;
-                        Alert.classList.add('alert-danger');
-                        Alert.style.display = 'block';
-                    }
-                })
-                
-                .catch(error => {
-                    console.error('Error:', error);
+                const button1 = document.createElement('button');
+                button1.textContent = 'ADD TO STOPWORDS LIST';
+                button1.classList.add('btn', 'btn-danger', 'mr-2'); // Add margin to the right
+    
+                // Add change event listener to the dropdown
+                button1.addEventListener('click', function(){
+                    AddKeywordsToStopwords(item[0],randomNumber);
+                  });
+        
+                // Create select element
+                const button2 = document.createElement('select');
+                button2.id = 'button2';
+        
+                // Define custom styles for the select element
+                button2.style.marginLeft = '5px';
+                button2.style.height = '40px';
+                button2.style.borderRadius = '5px';
+                button2.style.color = '#fff';
+                button2.style.backgroundColor = '#125909';
+                button2.style.borderColor = '#125909';
+                button2.style.transition = 'background-color 0.3s ease';
+        
+                // Define hover effect styles
+                button2.addEventListener('mouseenter', function () {
+                    button2.style.backgroundColor = '#125909'; // Change background color on hover
+                    button2.style.borderColor = '#125909'; // Change border color on hover
                 });
-            }
+        
+                button2.addEventListener('mouseleave', function () {
+                    button2.style.backgroundColor = '#125909'; // Reset background color on mouse leave
+                    button2.style.borderColor = '#125909'; // Reset border color on mouse leave
+                });
+        
+                // Populate the dropdown with file names
+                CandidateFiles.forEach(fileName => {
+                    const filename = fileName.replace(/\.[^/.]+$/, "")
+                      const option = document.createElement('option');
+                      option.value = filename;
+                      option.text = filename;
+                      button2.appendChild(option);
+                });
+        
+                // Add change event listener to the dropdown
+                button2.addEventListener('change', function(){
+                    AddKeywordsToCandidate(item[0],button2.value);
+                  });
+        
+                // Append the elements to the list item
+                buttonsContainer.appendChild(button1);
+                buttonsContainer.appendChild(button2);
+        
+                li.appendChild(itemText);
+                li.appendChild(buttonsContainer);
+                listContainer.appendChild(li);
+            });
         }
-    });
+        listContainer.appendChild(hr);
+        
+    }
+
+    function AddKeywordsToStopwords(keyword,randomNumber){
+        
+        // Send an HTTP POST request to your Python backend
+        fetch('/add_stopword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ keyword: keyword}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const Alert = document.getElementById('alertSuccess');
+                Alert.innerText = data.message;
+                Alert.style.display = 'block';
+                updateStopwords();
+                const liToRemove = document.getElementById(keyword+randomNumber);
+                if (liToRemove) {
+                    liToRemove.remove();
+                }
+            } else {
+                // Handle errors and display the error message in the Bootstrap alert
+                const Alert = document.getElementById('alertDanger');
+                Alert.innerText = data.error;
+                Alert.style.display = 'block';
+            }
+        })
+            
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function AddKeywordsToCandidate(keyword,file){
+       
+            // Send an HTTP POST request to your Python backend
+            fetch('/add_candidate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ keyword: keyword, file: file}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const Alert = document.getElementById('alertSuccess');
+                    Alert.innerText = data.message;
+                    Alert.style.display = 'block';
+                } else {
+                    // Handle errors and display the error message in the Bootstrap alert
+                    const Alert = document.getElementById('alertDanger');
+                    Alert.innerText = data.error;
+                    Alert.style.display = 'block';
+                }
+            })
+            
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    function DltKeywordsFromList(keyword,file,randomNumber){
+            // Send an HTTP POST request to your Python backend
+            fetch('/rm_candidate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ keyword: keyword, file: file}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const Alert = document.getElementById('alertSuccess');
+                    Alert.innerText = data.message;
+                    Alert.style.display = 'block';
+                    const liToRemove = document.getElementById(keyword+randomNumber);
+                    if (liToRemove) {
+                        liToRemove.remove();
+                    }
+                } else {
+                    // Handle errors and display the error message in the Bootstrap alert
+                    const Alert = document.getElementById('alertDanger');
+                    Alert.innerText = data.error;
+                    Alert.style.display = 'block';
+                }
+            })
+            
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    
 });

@@ -1,36 +1,31 @@
-<!--
-Copyright 2023 AIT Austrian Institute of Technology GmBH
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=0.9">
-    <title>Keyword Extraction Tool</title>
+    <title>Voctractor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <script>
+        function openTxtFile(url,event){
+            event.preventDefault(); // Prevent the link from navigating to a new page
+            var newWindow = window.open(url, "_blank");                         
+            newWindow.focus();
+
+        }
+    </script>
 </head>
 <body>
     <!-- Loading Icon -->
-    <div id="loading" class="text-center mt-4"> 
+    <center>
+    <div id="loading" class="loading" class="text-center mt-4"> 
         <!-- Loading spinner and message -->
         <div class="spinner-border text-white" role="status">
             <span class="sr-only"></span>
         </div>
         <p>Your document is being processed. This might take some time!</p>
     </div>
+</center>
+    <div class="header"><h3>Voctractor : AI-Powered Keyword Extraction Tool</h3></div>      
     <div class="container-fluid" id="screen">
         <div class="row">
             <!-- Sidebar -->
@@ -41,34 +36,65 @@ limitations under the License.
                                 <form id="uploadForm">
                                     <li class="nav-item">
                                         <div class="form-group">
+                                        <div id="alertDanger" class="alert alert-danger" style="display: none;"></div>  
+                                        <div id="alertSuccess" class="alert alert-success" style="display: none;"></div>   
                                         <div id="ValidationAlertPDF" class="alert alert-danger" style="display: none;"></div>
                                         <div class="mb-3">
-                                            <label for="pdfUpload" class="form-label">Add Your PDF File</label>
-                                            <input class="form-control" type="file" id="pdfUpload" style="height: 40px;">
+                                            <label for="pdfUpload" class="form-label">Add Mulitple PDF File</label>
+                                            <input class="form-control-file" type="file" id="pdfUpload" name="file_paths[]" style="height: 40px;" multiple>
                                         </div>
                                         </div>
                                     </li>
                                     <li class="nav-item">
+                                        <div class="form-group">
+                                            <label for="EmbedModel">Choose the embedding model to be used</label>
+                                            <select class="form-control" id="EmbedModel" name="EmbedModel">
+                                                <option value="all-MiniLM-L12-v2">all-MiniLM-L12-v2</option> 
+                                                <option value="all-distilroberta-v1">all-distilroberta-v1</option>
+                                                <option value="all-mpnet-base-v2">all-mpnet-base-v2</option>     
+                                                <option value="multi-qa-distilbert-cos-v1">multi-qa-distilbert-cos-v1</option>
+                                                <option value="multi-qa-MiniLM-L6-cos-v1">multi-qa-MiniLM-L6-cos-v1</option>             
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="modelDescription">Model Description</label>
+                                            <textarea class="form-control" id="modelDescription" rows="5" readonly>All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs.</textarea>
+                                        </div>
+                                        <script>
+                                            const modelDescriptions = {
+                                                "all-MiniLM-L12-v2" : "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs. For more information visit : https://www.sbert.net/docs/pretrained_models.html ",
+                                                "all-distilroberta-v1": "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs. For more information visit : https://www.sbert.net/docs/pretrained_models.html ",
+                                                "all-mpnet-base-v2" : "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs. For more information visit : https://www.sbert.net/docs/pretrained_models.html ",
+                                                "all-distilroberta-v1": "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs. For more information visit : https://www.sbert.net/docs/pretrained_models.html ",
+                                                "multi-qa-distilbert-cos-v1" : "This model was tuned for semantic search: Given a query/question, if can find relevant passages. It was trained on a large and diverse set of (question, answer) pairs. For more information visit : https://www.sbert.net/docs/pretrained_models.html ",
+                                                "multi-qa-MiniLM-L6-cos-v1": "This model was tuned for semantic search: Given a query/question, if can find relevant passages. It was trained on a large and diverse set of (question, answer) pairs. For more information visit : https://www.sbert.net/docs/pretrained_models.html ",
+                                                
+                                            };
+                                        
+                                            const EmbedModelSelect = document.getElementById("EmbedModel");
+                                            const modelDescriptionTextarea = document.getElementById("modelDescription");
+                                        
+                                            EmbedModelSelect.addEventListener("change", function() {
+                                                const selectedModel = EmbedModelSelect.value;
+                                                const description = modelDescriptions[selectedModel] || "No description available.";
+                                                modelDescriptionTextarea.value = description;
+                                            });
+                                        </script>
+                                    </li><br>
+                                    <li class="nav-item">
                                     <!-- Text Area to Display Stopwords -->
                                         <div class="form-group">
-                                        <label for="stopwordsTextArea">Stopwords 
+                                        <label for="stopwordsTextArea">Stopwords</label>
                                             <br><a href="/static/stopwords.txt"  download>Click here to download stopwords.txt file</a>
-                                            <br><a href="#" id="openStopwordsLink">Click here to open the text file</a>
+                                            <br><a href="/static/stopwords.txt" id="openStopwordsLink">Click here to view stopwords file</a>
                                             <script>
-                                            document.getElementById("openStopwordsLink").addEventListener("click", function (event) {
-                                            event.preventDefault(); // Prevent the link from navigating to a new page
-                                    
-                                            // Specify the URL of the text file you want to open
-                                            var url = "/static/stopwords.txt";
-                                    
-                                            // Use the window.open() method to open the text file in a new window
-                                            var newWindow = window.open(url, "_blank");
-                                            
-                                            // Focus on the new window (optional)
-                                            newWindow.focus();
-                                        });
-                                        </script>
-                                        </label>
+                                                const openFile = document.getElementById("openStopwordsLink");
+                                                url = openFile.href;
+                                                openFile.addEventListener("click", function(event) {
+                                                    openTxtFile(url,event)
+                                                });
+                                            </script>
+                                        
                                         <textarea id="stopwordsTextArea" class="form-control" rows="4" readonly></textarea>
                                         <script>
                                             // Function to create an XMLHttpRequest object
@@ -104,7 +130,7 @@ limitations under the License.
                                         </script>
                                         </div>
                                     </li>
-                                    <!-- Text Area to Add Stopwords -->
+                                    <!-- Text box to Add Stopwords -->
                                     <li class="nav-item">
                                     <div class="form-group">
                                       <label for="stopwordsInput">Add Stopwords</label>
@@ -113,38 +139,120 @@ limitations under the License.
                                       <small class="form-text text-muted">Make sure to separate words with commas.</small>
                                     </div>
                                     </li>
-                                  
-                                    <!-- Button to Add Candidate Keywords from Excel -->                     
+
+                                    <li class="nav-item">
+                                        <div class="form-group">
+                                            <label for="stopwordsDelete">Enter keywords to delete from stopwords</label>
+                                            <input type="text" id="stopwordsDelete" class="form-control">
+                                            <small class="form-text text-muted">Make sure to separate words with commas.</small>
+                                        </div>
+                                    </li>
+
                                     <li class="nav-item">
                                     <div class="form-group mt-4">
                                       <div class="mb-3">
-                                        <!-- <label for="excelUpload" class="form-label">Add Candidate Keywords (Excel Sheet with 1 Column)</label>
-                                        <div id="ValidationAlertExcel" class="alert alert-danger" style="display: none;"></div>
-                                        <input class="form-control" type="file" id="excelUpload" style="height: 40px;"> -->
                                         <h6><b>Select the taxonomy as candidates</b></h6>
-                                        <input class="form-check-input" type="radio" name="excelUpload" id="IPCC" value="static\Documents\taxonomies\IPCC.xlsx" checked>
+                                        <input class="form-check-input" type="radio" name="excelUpload" id="IPCC" value="static/Documents/taxonomies/IPCC.xlsx" checked>
                                         <label class="form-check-label" for="IPCC">IPCC</label><br>
-                                        <input class="form-check-input" type="radio" name="excelUpload" id="Dril" value="static\Documents\taxonomies\Dril.xlsx">
+                                        <input class="form-check-input" type="radio" name="excelUpload" id="Dril" value="static/Documents/taxonomies/Dril.xlsx">
                                         <label class="form-check-label" for="Dril">Disaster Resilient Infrastructure Lexicon</label>
-                                        <br><br><a href="/static/candidate.txt" download><b>Click here to download candidate.txt file</b></a>
-                                        <br><a href="#" id="openCandidateLink"><b>Click here to open the text file</b></a>
-                                        <script>
-                                            document.getElementById("openCandidateLink").addEventListener("click", function (event) {
-                                            event.preventDefault(); // Prevent the link from navigating to a new page
-                                    
-                                            // Specify the URL of the text file you want to open
-                                            var url = "/static/candidate.txt";
-                                    
-                                            // Use the window.open() method to open the text file in a new window
-                                            var newWindow = window.open(url, "_blank");
-                                            
-                                            // Focus on the new window (optional)
-                                            newWindow.focus();
-                                        });
+                                    </div>
+                                </div>
+                                    </li>
+
+                                    <li class="nav-item">
+                                    <div class="form-group mt-4">
+                                      <div class="mb-3">
+                                        <b><u>Available custom candidate lists</u></b><br>
+                                        <small class="form-text text-muted">Click on the names to view the keywords in the list</small><br>
+                                        <ol id="fileList">
+                                            {% for file in files %}
+                                                <li class="nav-item">
+                                                    <a href="#" onclick="openTxtFile('static/Candidates/' + '{{ file }}', event)">{{ file }}</a>
+                                                    <a href="static/Candidates/{{ file }}" style="margin-left:5px" download>Download</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ol><br>
+                                        <b>Do you want to add a new custom candidate list : </b>
+                                        <input class="form-check-input" type="radio" name="newCandidate" id="newCandidateYes" value="Yes" onchange="NewCandidateList()">
+                                        <label class="form-check-label" for="newCandidate">Yes</label>
+                                        <input class="form-check-input" type="radio" name="newCandidate" id="newCandidateNo" value="No" onchange="NewCandidateList()" checked>
+                                        <label class="form-check-label" for="newCandidate">No</label><br><br>
+                                        
+                                        <fieldset>
+                                        <div id="CandSuccess" class="alert alert-success" style="display: none;"></div>
+                                        <div id="ValidationAlertDetails" class="alert" style="display: none;"></div>
+                                        <div id="NewCanidateDetails" style="display: none;">
+                                            <label for="CandidateListName">Enter the new list name</label>
+                                            <input type="text" id="CandidateListName" class="form-control" placeholder="eg : Disater_List">
+                                            <label for="CandidateListOrg">Enter your organisation abbrivation</label>
+                                            <input type="text" id="CandidateListOrg" class="form-control" placeholder="eg : AIT"><br>
+                                            <button type="button" onclick="createCandidateList()" class="btn btn-success" style="width:325px">Process</button>
+                                        </div>
+                                        </fieldset>
+                                        <script>                                                
+                                            function NewCandidateList(){
+                                                var NewCanidateDetails = document.getElementById("NewCanidateDetails");
+                                                var yesRadio = document.getElementById("newCandidateYes");
+                                                var noRadio = document.getElementById("newCandidateNo");
+
+                                                if (yesRadio.checked) {
+                                                    NewCanidateDetails.style.display = "block";
+                                                } 
+                                                if (noRadio.checked) {
+                                                    NewCanidateDetails.style.display = "none";
+                                                }
+                                            }
+
+                                            function createCandidateList(){
+                                                const newCandidateName= document.getElementById('CandidateListName').value;
+                                                const newCandidateOrg= document.getElementById('CandidateListOrg').value;
+                                                
+                                                var ul = document.getElementById('fileList');
+                                                ul.innerHTML = '';
+                                                // Construct the data to be sent
+                                                var CformData = new FormData();
+                                                CformData.append('newCandidateName', newCandidateName);
+                                                CformData.append('newCandidateOrg', newCandidateOrg);
+
+                                                // Send a POST request to your Flask endpoint
+                                                fetch('/create_candidates_list', {
+                                                method: 'POST',
+                                                body: CformData
+                                                })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        const Alert = document.getElementById('CandSuccess');
+                                                        Alert.innerText = data.message;
+                                                        Alert.style.display = 'block';
+                                                        data.files.forEach(function(file) {
+                                                        var li = document.createElement('li');
+                                                        var a1 = document.createElement('a');
+                                                        var a2 = document.createElement('a');
+                                                        var br = document.createElement('br');
+                                                        a1.href = "static/Candidates/"+file;
+                                                        a1.textContent = file;
+                                                        a2.href = "static/Candidates/"+file;
+                                                        a2.textContent = "Download";
+                                                        a2.setAttribute = ('download', file);
+                                                        li.appendChild(a1);
+                                                        li.appendChild(a2);
+                                                        li.appendChild(br);
+                                                        ul.appendChild(li);
+                                                    });
+                                                    }
+                                                })
+                                                
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                });
+                                            }
                                         </script>
                                       </div>
                                     </div>
                                     </li>
+                                        
                                     <!-- Input Sliders -->
                                     <li class="nav-item">
                                     <div class="form-group">
@@ -191,60 +299,44 @@ limitations under the License.
             </div>
 
             <!-- Main Content -->
-            <main  class="col-md-8 col-lg-9 px-md-4">
+            <div id="main"  class="col-md-8 col-lg-9 px-md-4">
                 <div class="col-12 text-center mt-4">
-                    <h2 class="mb-4">AI-Powered Keyword Extraction Tool</h2>
                     <div class="container mt-5 " id="gettingStartedContainer">
                         <div id="excel_data" class="mt-5"></div>
                         <div class="alert alert-success text-dark">
                             <h4 class="alert-heading"><b>Getting Started</b></h4>
                             <p><strong>Here's a quick guide to get started:</strong></p>
-                            <ul>
+                            <ul style="list-style: none;">
                                 <li  class="text-left"><strong>Upload Documents :</strong> Click "Choose Files" to add your document. We support only PDF format.</li>
                                 <li><strong>Stopwords:</strong> The stopwords in the box displays all the stopwords in stopwords.txt file.</li>
                                 <li><strong>Add Stopwords :</strong> If you would like to add new stopwords enter them in this field comma seperated.</li>
-                                <li><strong>Add Candidate Keywords :</strong> Select a taxonomy from the list</li>
+                                <li><strong>Delete Stopwords :</strong> If you would like to delete stopwords enter them in this field comma seperated.</li>
+                                <li><strong>Candidate Keywords :</strong> Select a taxonomy from the list</li>
+                                <li><strong>Custom Candidate Lists :</strong> Choose yes and enter list name, your name and organistaion name in the respective field. Please don't use space in between, use underscore instead</li>
                                 <li>Choose the <strong>Number of keywords</strong>you want to extract and <strong>diversity between the words</strong>diversity between the words</li>
                             
                                 <hr>
-                                <p ><strong>The application will extract important keywords along with their scores and display it as 3 results</strong></p>
-                                <li><strong>Suggested Keywords</strong></li>
-                                <li><strong>Suggested Keyphrases</strong></li>
-                                <li><strong>Keywords from Candidates</strong></li><br>
+                                <p ><strong>The application will extract important keywords along with their scores in different lists</strong></p>
                                 <p>You can select the <strong> useful keywords on the tick button</strong> and it will be added to the list of future candidates</p>
                                 <p>You can unselect the <strong>useless keywords on the cross button</strong> and it will be added to the list of future stopwords</p>
                             </ul>
                             <hr>
-                            <p class="mb-0"><strong>It's that simple! Enjoy using the application for effortless document analysis.</strong></p>
+                            <p>The site is developed by AIT Autrsian Institute of Technology on MAIA project which has funding from European Union's Horizon Europe Research and Innovation programme under grant agreement No 101056935. Licensed under Apache 2.0.</p>
+                            <a href="https://www.ait.ac.at/en/"><img src="static/Documents/logos/ait-removebg-preview.png" height="60px" width="160px"></a>
+                            <a href="https://maia-project.eu/"  style="margin-left:20px"><img src="static/Documents/logos/MAIA-removebg-preview.png" height="60px" width="150px"></a>
+                            <a href="https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en"  style="margin-left:20px"><img src="static/Documents/logos/eu-removebg-preview.png" height="60px" width="150px"></a>
+                            <br><br><p class="mb-0"><strong>It's that simple! Enjoy using the application for effortless document analysis.</strong></p>
                         </div>
                     </div>
-                </div>
-                
-                    <div class="accordion" id="accordionResults" style="display: none;">
-                        <div class="accordion-item">
-                          <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                              Results of file 1
-                            </button>
-                          </h2>
-                          <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div id="alert" class="alert" style="display: none;"></div>
-                                  <div class="card" id="SuggestedKeywords" style="display:none"></div> 
-                                  <div class="card" id="SuggestedKeyphrases" style="display:none;"></div> 
-                                  <div class="card" id="CandidateKeywords" style="display:none;"></div> 
-                                <div class="card">
-                                  <div class="card-body" id="HighlightedText" style="display: none;"></div>
-                                </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                    </div>
+                </div><br>
+                <div id="content"></div>
                     
-            </main>
+            </div>
         </div>
     </div>
+    <!-- <div class="footer">
+        
+    </div> -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

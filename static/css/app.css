@@ -1,40 +1,34 @@
-/*
-Copyright 2023 AIT Austrian Institute of Technology GmbH
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 body{
-    margin:0%;
+    height: 100%;
+    margin:0;
     padding: 0;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
     zoom:90%;
   }
 
-  body.loading {
-    overflow: hidden; /* Prevent scrolling when the loading modal is visible */
-    position: relative;
+body.loading {
+    overflow-y:hidden; /* Prevent scrolling when the loading modal is visible */
+    /* position: relative; */
 }
 
 /* Styles for the loading spinner and message */
+
+.header,.footer {
+    text-align: center;
+    background-color: rgb(19, 53, 19);
+    color: white;
+    padding: 10px 0;
+  }
+
 #loading {
     position: fixed;
-    top: -10;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 120vh;
-    background: rgba(0, 0, 0, 0.849); /* Semi-transparent background to create a blur effect */
-    z-index: 9999; /* Make sure it's on top of other elements */
+    height:  100%;
+    background: rgba(0, 0, 0, 0.849);
+    z-index: 9999;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -45,7 +39,7 @@ body{
 .spinner-border {
     width: 3rem;
     height: 3rem;
-    margin-top:300px;
+    margin-top:25%;
     /* border-color: white; */
 }
 
@@ -55,10 +49,9 @@ body{
 #Sidebar{
     border-right: 3px solid darkgreen;
     width:405px;
-    position: -webkit-sticky;
     position: sticky;
     top: 0;
-    height: 111vh; /* Full screen height */
+    height: 105vh; /* Full screen height */
     overflow-y: auto; /* Add vertical scrolling if needed */
 }
 #sidebar ul.nav.flex-column {
@@ -75,18 +68,26 @@ body{
 }
 
 #Sidebar button{
-    width:300px;
+    width:350px;
 }
 
-#logout {
-    text-decoration: none;
-    margin-left: 100% !important; /* Add !important to ensure this value is used */
-    display: inline-block; /* This is important to make margin-left work */
-    transition: margin-left 0.3s; /* Add a smooth transition for margin-left */
+
+#NewCanidateDetails{
+    height:fit-content;
+    width:350px;
+    padding:10px;
+    border: 3px solid darkgreen;
 }
+
+/* #logout {
+    text-decoration: none;
+    margin-left: 100% !important; 
+    display: inline-block; 
+    transition: margin-left 0.3s; 
+} */
 
 /* Tooltip styles */
-#logout:hover::before {
+/* #logout:hover::before {
     content: "Logout";
     font-size: x-small;
     display: block;
@@ -98,29 +99,29 @@ body{
     margin-top: 50px;
     opacity: 0;
     transition: opacity 0.3s, margin-top 0.3s;
-}
+} */
 
-#logout:hover:hover::before {
+/* #logout:hover:hover::before {
     opacity: 1;
     margin-top: 0px;
     margin-left: -35px;
-}
+} */
 
 
-.highlightedG {
+/* .highlightedG {
     background-color: lightgreen;
     font-weight: bold;
-    }
+    } */
   
-  .highlightedB {
+  /* .highlightedB {
     background-color: lightblue;
     font-weight: bold;
-    }
+    } */
     
-  .highlightedP {
+/* .highlightedY {
     background-color: yellow;
     font-weight: bold;
-    }
+    } */
 
 
 
